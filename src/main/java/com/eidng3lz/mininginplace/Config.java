@@ -16,24 +16,44 @@ import java.util.stream.Collectors;
 // An example config class. This is not required, but it's a good idea to have one to keep your config organized.
 // Demonstrates how to use Neo's config APIs
 @EventBusSubscriber(modid = MiningInPlace.MODID, bus = EventBusSubscriber.Bus.MOD)
-public class Config
-{
+public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
     private static final ModConfigSpec.BooleanValue INVENT_CONTROL = BUILDER
             .comment("反转shift连锁控制")
-            .define("invent_control",false);
+            .define("invent_control", false);
 
     private static final ModConfigSpec.IntValue DEPTH_LIMIT = BUILDER
             .comment("最大搜索深度")
-            .defineInRange("depth_limit",16,0,Integer.MAX_VALUE);
+            .defineInRange("depth_limit", 16, 0, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.ConfigValue<List<? extends String>> CHAINLAND_BLOCKS_GROUPS = BUILDER
             .comment("连锁方块，每组逗号隔开")
             .defineListAllowEmpty(
                     "chainland_blocks_groups",
                     List.of(
-                            ""
+                            "minecraft:oak_log",
+                            "minecraft:spruce_log",
+                            "minecraft:birch_log",
+                            "minecraft:jungle_log",
+                            "minecraft:acacia_log",
+                            "minecraft:dark_oak_log",
+                            "minecraft:mangrove_log",
+                            "minecraft:cherry_log",
+                            "minecraft:pale_oak_log",
+                            "minecraft:crimson_stem",
+                            "minecraft:warped_stem",
+                            "minecraft:coal_ore,minecraft:deepslate_coal_ore",
+                            "minecraft:copper_ore,minecraft:deepslate_copper_ore",
+                            "minecraft:gold_ore,minecraft:deepslate_gold_ore",
+                            "minecraft:redstone_ore,minecraft:deepslate_redstone_ore",
+                            "minecraft:emerald_ore,minecraft:deepslate_emerald_ore",
+                            "minecraft:lapis_ore,minecraft:deepslate_lapis_ore",
+                            "minecraft:diamond_ore,minecraft:deepslate_diamond_ore",
+                            "minecraft:nether_gold_ore",
+                            "minecraft:nether_quartz_ore",
+                            "minecraft:ancient_debris",
+                            "minecraft:glowstone"
                     ),
                     Config::validateBlockGroups
             );
@@ -46,8 +66,7 @@ public class Config
     public static List<Set<Block>> chainlandBlocksGroups;
 
     @SubscribeEvent
-    static void onLoad(final ModConfigEvent event)
-    {
+    static void onLoad(final ModConfigEvent event) {
         inventControl = INVENT_CONTROL.get();
         depthLimit = DEPTH_LIMIT.get();
         chainlandBlocksGroups = CHAINLAND_BLOCKS_GROUPS.get().stream()
@@ -68,12 +87,12 @@ public class Config
         }
         for (String blockID : group.split(",")) {
             blockID = blockID.trim();
-            if (blockID.isEmpty()){
+            if (blockID.isEmpty()) {
                 continue;
             }
             try {
                 ResourceLocation resourceLocation = ResourceLocation.parse(blockID);
-                if (!BuiltInRegistries.BLOCK.containsKey(resourceLocation)){
+                if (!BuiltInRegistries.BLOCK.containsKey(resourceLocation)) {
                     return false;
                 }
             } catch (Exception e) {
