@@ -3,7 +3,6 @@ package com.eidng3lz.mininginplace.eventlisteners;
 import com.eidng3lz.mininginplace.Config;
 import com.eidng3lz.mininginplace.MiningInPlace;
 import com.eidng3lz.mininginplace.utils.Dfs;
-import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LevelAccessor;
@@ -20,12 +19,17 @@ import java.util.Set;
 public class OnBlockBreak {
     @SubscribeEvent
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
-        LogUtils.getLogger().info("block break");
+//        LogUtils.getLogger().info("block break");
 
         LevelAccessor world = event.getLevel();
         BlockPos eventBlockPos = event.getPos();
         BlockState eventBlockState = event.getState();
         Player player = event.getPlayer();
+
+        //如果触发破坏的不是真玩家则直接跳过
+        if (!player.getClass().getSimpleName().equals("ServerPlayer")) {
+            return;
+        }
 
         //计算搜索目标
         Set<Block> blockGroups = new HashSet<>();
@@ -35,18 +39,20 @@ public class OnBlockBreak {
             }
         }
 
-        LogUtils.getLogger().info("group:");
-        for (Block block : blockGroups) {
-            LogUtils.getLogger().info(block.toString());
-        }
-        LogUtils.getLogger().info("player conf:{}", MiningInPlace.playerConfigs.get(player.getName().getString()));
-        LogUtils.getLogger().info("player sneaking:{}", player.isShiftKeyDown());
+//        LogUtils.getLogger().info("group:");
+//        for (Block block : blockGroups) {
+//            LogUtils.getLogger().info(block.toString());
+//        }
+//        LogUtils.getLogger().info("player conf:{}", MiningInPlace.playerConfigs.get(player.getName().getString()));
+//        LogUtils.getLogger().info("player sneaking:{}", player.isShiftKeyDown());
 
         //判断方块属于目标且玩家当前需要连锁破坏
         if (!blockGroups.isEmpty() && (player.isShiftKeyDown() == MiningInPlace.playerConfigs.get(player.getName().getString()))) {
             Dfs dfs = new Dfs();
             BlockPos togetBlockPos = dfs.dfs(world, eventBlockPos, blockGroups, Config.depthLimit).getFirst().getKey();
             MiningInPlace.queueServerWork(1, new MoveBlock(world, togetBlockPos, eventBlockPos));
+            //设置flag通知BlockDrops事件监听逻辑，准备移动和弹射掉落物
+            MiningInPlace.blockBreakEventFlag.put(player.toString(), 0);
         }
     }
 

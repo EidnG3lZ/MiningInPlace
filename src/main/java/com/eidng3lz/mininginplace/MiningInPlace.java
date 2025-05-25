@@ -19,6 +19,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import org.slf4j.Logger;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -30,6 +31,7 @@ public class MiningInPlace {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public static Map<String, Boolean> playerConfigs = new HashMap<>();
+    public static ConcurrentHashMap<String, Integer> blockBreakEventFlag = new ConcurrentHashMap<>();
 
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
@@ -90,5 +92,12 @@ public class MiningInPlace {
         });
         actions.forEach(e -> e.getA().run());
         workQueue.removeAll(actions);
+    }
+
+    @SubscribeEvent
+    public void clearBlockBreakEventFlag(ServerTickEvent.Pre event) {
+        if (!blockBreakEventFlag.isEmpty()) {
+            blockBreakEventFlag.clear();
+        }
     }
 }
