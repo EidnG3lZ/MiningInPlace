@@ -2,11 +2,9 @@ package com.eidng3lz.mininginplace.utils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Block;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.Stack;
 
 public class Dfs {
@@ -47,7 +45,7 @@ public class Dfs {
 
     //private final int DEPTH_LIMIT = 16;
 
-    public List<KeyValuePair<BlockPos, Integer>> dfs(LevelAccessor world, BlockPos startPos, Set<Block> blockGroups, int depthLimit) {
+    public List<KeyValuePair<BlockPos, Integer>> dfs(LevelAccessor world, BlockPos startPos, BlockGroup blockGroup, int depthLimit) {
         Stack<SearchNode> searchNodeStack = new Stack<>();
         searchNodeStack.push(new SearchNode(startPos, 0));
 
@@ -70,7 +68,7 @@ public class Dfs {
                             pos.getY() + offset[1],
                             pos.getZ() + offset[2]
                     );
-                    if (blockGroups.contains(world.getBlockState(newPos).getBlock()) && !containsPos(newPos)) {
+                    if (blockGroup.contains(world.getBlockState(newPos).getBlock()) && !containsPos(newPos)) {
                         searchNodeStack.push(new SearchNode(newPos, depth + 1));
                     }
                 }
