@@ -45,7 +45,7 @@ public class Dfs {
 
     //private final int DEPTH_LIMIT = 16;
 
-    public List<KeyValuePair<BlockPos, Integer>> dfs(LevelAccessor world, BlockPos startPos, BlockGroup blockGroup, int depthLimit) {
+    public List<KeyValuePair<BlockPos, Integer>> dfs(LevelAccessor world, BlockPos startPos, BlockGroup blockGroup, int depthLimit, int searchStepsLimit) {
         Stack<SearchNode> searchNodeStack = new Stack<>();
         searchNodeStack.push(new SearchNode(startPos, 0));
 
@@ -56,7 +56,7 @@ public class Dfs {
 //            }
 //        }
 
-        while (!searchNodeStack.isEmpty()) {
+        while (!searchNodeStack.isEmpty() && searchedPosList.size() <= searchStepsLimit) {
             SearchNode currentNode = searchNodeStack.pop();
             BlockPos pos = currentNode.pos;
             int depth = currentNode.depth;
@@ -75,7 +75,7 @@ public class Dfs {
             }
         }
 
-        searchedPosList.sort((o1, o2) -> Integer.compare(o2.getValue(), o1.getValue()));
+//        searchedPosList.sort((o1, o2) -> Integer.compare(o2.getValue(), o1.getValue()));
         return searchedPosList;
     }
 

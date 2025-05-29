@@ -1,12 +1,15 @@
 package com.eidng3lz.mininginplace;
 
+import com.eidng3lz.mininginplace.network.ConfigPayload;
 import com.eidng3lz.mininginplace.utils.BlockGroup;
+import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,14 +22,22 @@ public class Config {
 
     private static final ModConfigSpec.BooleanValue INVENT_CONTROL = BUILDER
             .comment("反转潜行连锁控制", "默认潜行时停止连锁")
+            .translation("mininginplace.config.invent_control")
             .define("invent_control", false);
 
     private static final ModConfigSpec.IntValue DEPTH_LIMIT = BUILDER
-            .comment("最大搜索深度。请勿设置过大的数值，以免造成性能问题。")
-            .defineInRange("depth_limit", 16, 0, Integer.MAX_VALUE);
+            .comment("最大搜索深度", "请勿设置过大的数值，以免可能出现的性能问题。")
+            .translation("mininginplace.config.depth_limit")
+            .defineInRange("depth_limit", 64, 0, Integer.MAX_VALUE);
+
+    private static final ModConfigSpec.IntValue SEARCH_STEPS_LIMIT = BUILDER
+            .comment("最大搜索步数", "请勿设置过大的数值，以免可能出现的性能问题。")
+            .translation("mininginplace.config.search_steps_limit")
+            .defineInRange("search_steps_limit", 128, 0, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.ConfigValue<List<? extends String>> CHAINLAND_BLOCKS_GROUPS = BUILDER
-            .comment("连锁方块，每个字符串为一组，组内的多个ID或Tag之间用逗号分隔，Tag需要以#开头。", "命名空间为minecraft时可省略。")
+            .comment("连锁方块组", "每个字符串为一组，组内的多个ID或Tag之间用逗号分隔，Tag需要以#开头。", "命名空间为minecraft时可省略。")
+            .translation("mininginplace.config.blocks_groups")
             .defineListAllowEmpty(
                     "chainland_blocks_groups",
                     List.of(
@@ -54,6 +65,7 @@ public class Config {
                             "minecraft:ancient_debris",
                             "minecraft:glowstone"
                     ),
+                    () -> "",
                     Config::validateBlockGroups
             );
 
@@ -62,12 +74,14 @@ public class Config {
 
     public static boolean inventControl;
     public static int depthLimit;
+    public static int searchStepsLimit;
     public static List<BlockGroup> chainlandBlocksGroups;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
         inventControl = INVENT_CONTROL.get();
         depthLimit = DEPTH_LIMIT.get();
+        searchStepsLimit = SEARCH_STEPS_LIMIT.get();
 //        chainlandBlocksGroups = CHAINLAND_BLOCKS_GROUPS.get().stream()
 //                .map(
 //                        group -> Arrays.stream(group.split(","))
@@ -92,6 +106,13 @@ public class Config {
                 blockGroup.addFromStr(s);
             }
             chainlandBlocksGroups.add(blockGroup);
+        }
+        //尝试向服务端同步用户配置
+        //当前处于未进入世界等情况时向服务端发数据包会抛错误，这里直接选择用try catch拦截掉这个错误
+        try {
+            PacketDistributor.sendToServer(new ConfigPayload(inventControl));
+        } catch (Exception e) {
+            LogUtils.getLogger().info(e.getMessage());
         }
     }
 

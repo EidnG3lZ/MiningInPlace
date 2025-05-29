@@ -18,7 +18,9 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import org.slf4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -30,7 +32,7 @@ public class MiningInPlace {
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static Map<String, Boolean> playerConfigs = new HashMap<>();
+    public static ConcurrentHashMap<String, Boolean> playerConfigs = new ConcurrentHashMap<>();
     public static ConcurrentHashMap<String, Integer> blockBreakEventFlag = new ConcurrentHashMap<>();
 
 

@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,7 +24,24 @@ public class BlockGroup {
             TagKey<Block> tagKey = TagKey.create(Registries.BLOCK, ResourceLocation.tryParse(blockIDOrTag.substring(1)));
             return tagKeySet.add(tagKey);
         }
-        Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(blockIDOrTag));
+//        Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(blockIDOrTag));
+        Block block;
+        Class<?> clazz = BuiltInRegistries.BLOCK.getClass();
+        try {
+            try {
+                //尝试使用1.21.2+的方法
+//                LogUtils.getLogger().info("use new method:");
+                Method methodNew = clazz.getMethod("getValue", ResourceLocation.class);
+                block = (Block) methodNew.invoke(BuiltInRegistries.BLOCK, ResourceLocation.tryParse(blockIDOrTag));
+            } catch (NoSuchMethodException e) {
+                //找不到方法时使用1.21的方法
+//                LogUtils.getLogger().info("use old method:");
+                Method methodOld = clazz.getMethod("get", ResourceLocation.class);
+                block = (Block) methodOld.invoke(BuiltInRegistries.BLOCK, ResourceLocation.tryParse(blockIDOrTag));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return blockSet.add(block);
     }
 
