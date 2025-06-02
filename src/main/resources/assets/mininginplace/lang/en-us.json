@@ -1,5 +1,6 @@
 {
   "mininginplace.config.invent_control": "Invent control",
+  "mininginplace.config.disable_at_creative": "Disable at creative",
   "mininginplace.config.depth_limit": "Maximum search depth",
   "mininginplace.config.search_steps_limit": "Search steps limit",
   "mininginplace.config.blocks_groups": "Chainland blocks groups"

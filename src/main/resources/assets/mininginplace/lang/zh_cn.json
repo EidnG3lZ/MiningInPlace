@@ -1,5 +1,6 @@
 {
   "mininginplace.config.invent_control": "反转潜行连锁控制",
+  "mininginplace.config.disable_at_creative": "创造模式下禁用",
   "mininginplace.config.depth_limit": "最大搜索深度",
   "mininginplace.config.search_steps_limit": "最大搜索步数",
   "mininginplace.config.blocks_groups": "连锁方块组"

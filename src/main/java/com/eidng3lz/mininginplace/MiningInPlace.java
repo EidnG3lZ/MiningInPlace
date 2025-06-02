@@ -1,5 +1,6 @@
 package com.eidng3lz.mininginplace;
 
+import com.google.gson.Gson;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Tuple;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -32,7 +34,9 @@ public class MiningInPlace {
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static ConcurrentHashMap<String, Boolean> playerConfigs = new ConcurrentHashMap<>();
+    public static Gson gson = new Gson();
+
+    public static ConcurrentHashMap<String, Map<Config.ClientConfigs, Object>> playerConfigs = new ConcurrentHashMap<>();
     public static ConcurrentHashMap<String, Integer> blockBreakEventFlag = new ConcurrentHashMap<>();
 
 

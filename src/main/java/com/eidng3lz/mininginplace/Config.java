@@ -1,7 +1,8 @@
 package com.eidng3lz.mininginplace;
 
-import com.eidng3lz.mininginplace.network.ConfigPayload;
+import com.eidng3lz.mininginplace.network.Packets;
 import com.eidng3lz.mininginplace.utils.BlockGroup;
+import com.google.common.reflect.TypeToken;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -11,8 +12,12 @@ import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 // An example config class. This is not required, but it's a good idea to have one to keep your config organized.
 // Demonstrates how to use Neo's config APIs
@@ -24,6 +29,11 @@ public class Config {
             .comment("反转潜行连锁控制", "默认潜行时停止连锁")
             .translation("mininginplace.config.invent_control")
             .define("invent_control", false);
+
+    private static final ModConfigSpec.BooleanValue DISABLE_AT_CREATIVE = BUILDER
+            .comment("创造模式下禁用")
+            .translation("mininginplace.config.disable_at_creative")
+            .define("disable_at_creative", true);
 
     private static final ModConfigSpec.IntValue DEPTH_LIMIT = BUILDER
             .comment("最大搜索深度", "请勿设置过大的数值，以免可能出现的性能问题。")
@@ -73,6 +83,7 @@ public class Config {
     static final ModConfigSpec SPEC = BUILDER.build();
 
     public static boolean inventControl;
+    public static boolean disableAtCreative;
     public static int depthLimit;
     public static int searchStepsLimit;
     public static List<BlockGroup> chainlandBlocksGroups;
@@ -80,6 +91,7 @@ public class Config {
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
         inventControl = INVENT_CONTROL.get();
+        disableAtCreative = DISABLE_AT_CREATIVE.get();
         depthLimit = DEPTH_LIMIT.get();
         searchStepsLimit = SEARCH_STEPS_LIMIT.get();
 //        chainlandBlocksGroups = CHAINLAND_BLOCKS_GROUPS.get().stream()
@@ -110,7 +122,7 @@ public class Config {
         //尝试向服务端同步用户配置
         //当前处于未进入世界等情况时向服务端发数据包会抛错误，这里直接选择用try catch拦截掉这个错误
         try {
-            PacketDistributor.sendToServer(new ConfigPayload(inventControl));
+            PacketDistributor.sendToServer(new Packets.RequestPacket(Packets.RequestPacket.SET_CLIENT_CONFIGS, getClientConfigsToJSON()));
         } catch (Exception e) {
             LogUtils.getLogger().info(e.getMessage());
         }
@@ -145,5 +157,39 @@ public class Config {
             }
         }
         return true;
+    }
+
+    //将所有客户端配置转换成json字符串
+    public static String getClientConfigsToJSON() {
+        Map<ClientConfigs, Object> map = new HashMap<>();
+        for (ClientConfigs clientConfig : ClientConfigs.values()) {
+            map.put(clientConfig, clientConfig.getConfig().get());
+        }
+        Type type = new TypeToken<Map<ClientConfigs, Object>>() {
+        }.getType();
+        String json = MiningInPlace.gson.toJson(map, type);
+//        LogUtils.getLogger().info(json);//test
+        return json;
+    }
+
+    public enum ClientConfigs {
+        INVENT_CONTROL("invent control", Config.INVENT_CONTROL),
+        DISABLE_AT_CREATIVE("disable at creative", Config.DISABLE_AT_CREATIVE);
+
+        private final String name;
+        private final Supplier<?> config;
+
+        ClientConfigs(String name, Supplier<?> config) {
+            this.name = name;
+            this.config = config;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Supplier<?> getConfig() {
+            return config;
+        }
     }
 }

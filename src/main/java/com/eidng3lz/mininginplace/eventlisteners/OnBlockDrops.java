@@ -46,13 +46,14 @@ public class OnBlockDrops {
                             breakerEntity.getViewVector(1),
                             new Vec3(eventPos.getX(), eventPos.getY(), eventPos.getZ())
                     );
+                    double offset = (BLOCK_SIZE + ITEM_ENTITY_SIZE) / 2;
                     moveToVec = switch (result0.getB()) {
-                        case 0 -> result0.getA().add(-ITEM_ENTITY_SIZE / 2, 0, 0);
-                        case 1 -> result0.getA().add(0, -ITEM_ENTITY_SIZE / 2, 0);
-                        case 2 -> result0.getA().add(0, 0, -ITEM_ENTITY_SIZE / 2);
-                        case 3 -> result0.getA().add(ITEM_ENTITY_SIZE / 2, 0, 0);
-                        case 4 -> result0.getA().add(0, ITEM_ENTITY_SIZE / 2, 0);
-                        case 5 -> result0.getA().add(0, 0, ITEM_ENTITY_SIZE / 2);
+                        case 0 -> eventPos.getCenter().add(-offset, 0, 0);
+                        case 1 -> eventPos.getCenter().add(0, -offset, 0);
+                        case 2 -> eventPos.getCenter().add(0, 0, -offset);
+                        case 3 -> eventPos.getCenter().add(offset, 0, 0);
+                        case 4 -> eventPos.getCenter().add(0, offset, 0);
+                        case 5 -> eventPos.getCenter().add(0, 0, offset);
                         default -> moveToVec;
                     };
                     moveToVec = moveToVec.add(0, -ITEM_ENTITY_SIZE / 2, 0);

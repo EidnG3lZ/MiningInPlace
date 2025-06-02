@@ -15,6 +15,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
 import java.util.List;
+import java.util.Map;
 
 @EventBusSubscriber(modid = MiningInPlace.MODID)
 public class OnBlockBreak {
@@ -26,6 +27,8 @@ public class OnBlockBreak {
         BlockPos eventBlockPos = event.getPos();
         BlockState eventBlockState = event.getState();
         Player player = event.getPlayer();
+
+//        LogUtils.getLogger().info("player game mode:{}",((ServerPlayer)player).gameMode.getGameModeForPlayer().getName());
 
         //如果触发破坏的不是真玩家则直接跳过
         if (!player.getClass().getSimpleName().equals("ServerPlayer")) {
@@ -54,7 +57,12 @@ public class OnBlockBreak {
 //        LogUtils.getLogger().info("player sneaking:{}", player.isShiftKeyDown());
 
         //判断方块属于目标且玩家当前需要连锁破坏
-        if (!blockGroup.isEmpty() && (player.isShiftKeyDown() == MiningInPlace.playerConfigs.get(player.getName().getString()))) {
+        Map<Config.ClientConfigs, Object> clientConfigsMap = MiningInPlace.playerConfigs.get(player.getName().getString());
+        if (
+                !blockGroup.isEmpty()
+                        && (player.isShiftKeyDown() == (boolean) (clientConfigsMap.get(Config.ClientConfigs.INVENT_CONTROL)))
+                        && !(((boolean) clientConfigsMap.get(Config.ClientConfigs.DISABLE_AT_CREATIVE)) && player.isCreative())
+        ) {
             Dfs dfs = new Dfs();
             List<KeyValuePair<BlockPos, Integer>> dfsResultsList = dfs.dfs(world, eventBlockPos, blockGroup, Config.depthLimit, Config.searchStepsLimit);
             BlockPos targetBlockPos;
