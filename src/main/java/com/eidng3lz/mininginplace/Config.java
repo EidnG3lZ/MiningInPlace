@@ -26,27 +26,27 @@ public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
     private static final ModConfigSpec.BooleanValue INVENT_CONTROL = BUILDER
-            .comment("反转潜行连锁控制", "默认潜行时停止连锁")
+            .comment("反转潜行连锁控制", "客户端配置", "默认潜行时停止连锁。")
             .translation("mininginplace.config.invent_control")
             .define("invent_control", false);
 
     private static final ModConfigSpec.BooleanValue DISABLE_AT_CREATIVE = BUILDER
-            .comment("创造模式下禁用")
+            .comment("创造模式下禁用", "客户端配置")
             .translation("mininginplace.config.disable_at_creative")
             .define("disable_at_creative", true);
 
     private static final ModConfigSpec.IntValue DEPTH_LIMIT = BUILDER
-            .comment("最大搜索深度", "请勿设置过大的数值，以免可能出现的性能问题。")
+            .comment("最大搜索深度", "服务端配置", "请勿设置过大的数值，以免出现性能问题。")
             .translation("mininginplace.config.depth_limit")
             .defineInRange("depth_limit", 64, 0, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.IntValue SEARCH_STEPS_LIMIT = BUILDER
-            .comment("最大搜索步数", "请勿设置过大的数值，以免可能出现的性能问题。")
+            .comment("最大搜索步数", "服务端配置", "请勿设置过大的数值，以免出现性能问题。")
             .translation("mininginplace.config.search_steps_limit")
-            .defineInRange("search_steps_limit", 128, 0, Integer.MAX_VALUE);
+            .defineInRange("search_steps_limit", 256, 0, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.ConfigValue<List<? extends String>> CHAINLAND_BLOCKS_GROUPS = BUILDER
-            .comment("连锁方块组", "每个字符串为一组，组内的多个ID或Tag之间用逗号分隔，Tag需要以#开头。", "命名空间为minecraft时可省略。")
+            .comment("连锁方块组", "服务端配置", "每个字符串为一组，组内的多个ID或Tag之间用逗号分隔，Tag需要以#开头。", "命名空间为minecraft时命名空间可省略。")
             .translation("mininginplace.config.blocks_groups")
             .defineListAllowEmpty(
                     "chainland_blocks_groups",
@@ -62,14 +62,14 @@ public class Config {
                             "minecraft:pale_oak_log",
                             "minecraft:crimson_stem",
                             "minecraft:warped_stem",
-                            "minecraft:coal_ore,minecraft:deepslate_coal_ore",
-                            "minecraft:iron_ore,minecraft:deepslate_iron_ore,minecraft:raw_iron_block",
-                            "minecraft:copper_ore,minecraft:deepslate_copper_ore,minecraft:raw_copper_block",
-                            "minecraft:gold_ore,minecraft:deepslate_gold_ore",
-                            "minecraft:redstone_ore,minecraft:deepslate_redstone_ore",
-                            "minecraft:emerald_ore,minecraft:deepslate_emerald_ore",
-                            "minecraft:lapis_ore,minecraft:deepslate_lapis_ore",
-                            "minecraft:diamond_ore,minecraft:deepslate_diamond_ore",
+                            "#minecraft:coal_ores",
+                            "#minecraft:iron_ores,minecraft:raw_iron_block",
+                            "#minecraft:copper_ores,minecraft:raw_copper_block",
+                            "#minecraft:gold_ores",
+                            "#minecraft:redstone_ores",
+                            "#minecraft:emerald_ores",
+                            "#minecraft:lapis_ores",
+                            "#minecraft:diamond_ores",
                             "minecraft:nether_gold_ore",
                             "minecraft:nether_quartz_ore",
                             "minecraft:ancient_debris",
@@ -123,8 +123,8 @@ public class Config {
         //当前处于未进入世界等情况时向服务端发数据包会抛错误，这里直接选择用try catch拦截掉这个错误
         try {
             PacketDistributor.sendToServer(new Packets.RequestPacket(Packets.RequestPacket.SET_CLIENT_CONFIGS, getClientConfigsToJSON()));
-        } catch (Exception e) {
-            LogUtils.getLogger().info(e.getMessage());
+        } catch (NullPointerException e) {
+            LogUtils.getLogger().info(e.toString());
         }
     }
 

@@ -2,7 +2,6 @@ package com.eidng3lz.mininginplace.eventlisteners;
 
 import com.eidng3lz.mininginplace.MiningInPlace;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.phys.Vec3;
@@ -11,7 +10,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @EventBusSubscriber(modid = MiningInPlace.MODID)
@@ -41,13 +39,13 @@ public class OnBlockDrops {
                     Vec3 offsetVec = getOffsetVec(relativelyVec, BLOCK_SIZE, ITEM_ENTITY_SIZE);
                     moveToVec = eventPos.getCenter().add(offsetVec).add(0, -ITEM_ENTITY_SIZE / 2, 0);
                 } else {
-                    Tuple<Vec3, Integer> result0 = getIntersection(
+                    int result0 = getIntersection(
                             breakerEntity.getEyePosition(),
                             breakerEntity.getViewVector(1),
                             new Vec3(eventPos.getX(), eventPos.getY(), eventPos.getZ())
                     );
                     double offset = (BLOCK_SIZE + ITEM_ENTITY_SIZE) / 2;
-                    moveToVec = switch (result0.getB()) {
+                    moveToVec = switch (result0) {
                         case 0 -> eventPos.getCenter().add(-offset, 0, 0);
                         case 1 -> eventPos.getCenter().add(0, -offset, 0);
                         case 2 -> eventPos.getCenter().add(0, 0, -offset);
@@ -77,56 +75,44 @@ public class OnBlockDrops {
         return relativelyVec.multiply(zoomMultiplier, zoomMultiplier, zoomMultiplier);
     }
 
-    private static Tuple<Vec3, Integer> getIntersection(Vec3 startPos, Vec3 direction, Vec3 aabbMinPos) {
+    private static int getIntersection(Vec3 startPos, Vec3 direction, Vec3 aabbMinPos) {
         double[] startPosArr = {startPos.x(), startPos.y(), startPos.z()};
         double[] directionArr = {direction.x(), direction.y(), direction.z()};
         double[] aabbMinPosArr = {aabbMinPos.x(), aabbMinPos.y(), aabbMinPos.z()};
+        double[] aabbMaxPosArr = {aabbMinPos.x() + 1, aabbMinPos.y() + 1, aabbMinPos.z() + 1};
+
+        double tNear = Double.NEGATIVE_INFINITY;
+        int faceIndex = -1;
 
         //(x,y,z)=(x0+t*xd,y0+t*yd,z0+t*zd)
-
-        List<Tuple<Double, Integer>> tList = new ArrayList<>();
 
         for (int i = 0; i < 3; i++) {
             if (directionArr[i] == 0) {
                 continue;
             }
-            double t;
-            t = (aabbMinPosArr[i] - startPosArr[i]) / directionArr[i];
-            double v0 = startPosArr[(i + 1) % 3] + t * directionArr[(i + 1) % 3];
-            double v1 = startPosArr[(i + 2) % 3] + t * directionArr[(i + 2) % 3];
-            if (
-                    v0 > aabbMinPosArr[(i + 1) % 3]
-                            && v0 < aabbMinPosArr[(i + 1) % 3] + 1
-                            && v1 > aabbMinPosArr[(i + 2) % 3]
-                            && v1 < aabbMinPosArr[(i + 2) % 3] + 1
-            ) {
-                tList.add(new Tuple<>(t, i));
+            double invDir = 1.0 / directionArr[i];
+            double t1 = (aabbMinPosArr[i] - startPosArr[i]) * invDir;
+            double t2 = (aabbMaxPosArr[i] - startPosArr[i]) * invDir;
+
+            int intersectIn;
+            double tMin;
+            if (t1 < t2) {
+                intersectIn = -1;
+                tMin = t1;
+            } else {
+                intersectIn = 1;
+                tMin = t2;
             }
-            t = (aabbMinPosArr[i] + 1 - startPosArr[i]) / directionArr[i];
-            v0 = startPosArr[(i + 1) % 3] + t * directionArr[(i + 1) % 3];
-            v1 = startPosArr[(i + 2) % 3] + t * directionArr[(i + 2) % 3];
-            if (
-                    v0 > aabbMinPosArr[(i + 1) % 3]
-                            && v0 < aabbMinPosArr[(i + 1) % 3] + 1
-                            && v1 > aabbMinPosArr[(i + 2) % 3]
-                            && v1 < aabbMinPosArr[(i + 2) % 3] + 1
-            ) {
-                tList.add(new Tuple<>(t, i + 3));
-            }
-        }
-        Tuple<Double, Integer> tMin = tList.getFirst();
-        for (Tuple<Double, Integer> i : tList) {
-            if (i.getA() < tMin.getA()) {
-                tMin = i;
+
+            if (tMin > tNear) {
+                tNear = tMin;
+                if (intersectIn == -1) {
+                    faceIndex = i;
+                } else if (intersectIn == 1) {
+                    faceIndex = i + 3;
+                }
             }
         }
-        return new Tuple<>(
-                new Vec3(
-                        startPos.x() + tMin.getA() * direction.x(),
-                        startPos.y() + tMin.getA() * direction.y(),
-                        startPos.z() + tMin.getA() * direction.z()
-                ),
-                tMin.getB()
-        );
+        return faceIndex;
     }
 }

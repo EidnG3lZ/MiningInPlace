@@ -3,5 +3,14 @@
   "mininginplace.config.disable_at_creative": "创造模式下禁用",
   "mininginplace.config.depth_limit": "最大搜索深度",
   "mininginplace.config.search_steps_limit": "最大搜索步数",
-  "mininginplace.config.blocks_groups": "连锁方块组"
+  "mininginplace.config.blocks_groups": "连锁方块组",
+  "mininginplace.configuration.section.mininginplace.common.toml.title": "Mining in place配置",
+  "mininginplace.config.search_steps_limit.tooltip": "服务端配置\n请勿设置过大的数值，以免出现性能问题。",
+  "mininginplace.config.depth_limit.tooltip": "服务端配置\n请勿设置过大的数值，以免出现性能问题。",
+  "mininginplace.config.blocks_groups.button": "编辑...",
+  "mininginplace.config.invent_control.tooltip": "客户端配置\n默认潜行时停止连锁",
+  "mininginplace.config.blocks_groups.tooltip": "服务端配置\n每个字符串为一组，组内的多个ID或Tag之间用逗号分隔，Tag需要以#开头。\n命名空间为minecraft时命名空间可省略。",
+  "mininginplace.configuration.title": "mininginplace.configuration.title",
+  "mininginplace.config.disable_at_creative.tooltip": "客户端配置",
+  "mininginplace.configuration.section.mininginplace.common.toml": "mininginplace.configuration.section.mininginplace.common.toml"
 }

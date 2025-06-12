@@ -11,15 +11,10 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class Packets {
-    private static final Logger log = LoggerFactory.getLogger(Packets.class);
-
     public record RequestPacket(String request, String args) implements CustomPacketPayload {
         //requests
         public static final String GET_CLIENT_CONFIGS = "get-client-configs";
@@ -50,7 +45,7 @@ public class Packets {
             switch (packet.request()) {
                 case RequestPacket.GET_CLIENT_CONFIGS -> LogUtils.getLogger().info("server side not supported");
                 case RequestPacket.SET_CLIENT_CONFIGS -> {
-                    Map<Config.ClientConfigs, Object> map = new HashMap<>();
+                    Map<Config.ClientConfigs, Object> map;
                     map = MiningInPlace.gson.fromJson(packet.args(), new TypeToken<Map<Config.ClientConfigs, Object>>() {
                     });
                     MiningInPlace.playerConfigs.put(context.player().getName().getString(), map);

@@ -1,0 +1,16 @@
+{
+  "mininginplace.config.invent_control": "Invent control",
+  "mininginplace.config.disable_at_creative": "Disable at creative",
+  "mininginplace.config.depth_limit": "Maximum search depth",
+  "mininginplace.config.search_steps_limit": "Search steps limit",
+  "mininginplace.config.blocks_groups": "Chainland blocks groups",
+  "mininginplace.configuration.section.mininginplace.common.toml.title": "Mining in place configs",
+  "mininginplace.config.search_steps_limit.tooltip": "Server-side configuration\nDo not set too large a number to avoid performance issues.",
+  "mininginplace.config.depth_limit.tooltip": "Server-side configuration\nDo not set too large a number to avoid performance issues.",
+  "mininginplace.config.blocks_groups.button": "Edit...",
+  "mininginplace.config.invent_control.tooltip": "Client configuration\nBy default, function stops while sneaking",
+  "mininginplace.config.blocks_groups.tooltip": "Server-side configuration\nEach string is a group, separated by a comma between multiple IDs or Tags in the group, and the Tags need to start with #.\nIf the namespace is minecraft, the namespace can be omitted.",
+  "mininginplace.configuration.title": "mininginplace.configuration.title",
+  "mininginplace.config.disable_at_creative.tooltip": "Client configuration",
+  "mininginplace.configuration.section.mininginplace.common.toml": "mininginplace.configuration.section.mininginplace.common.toml"
+}
