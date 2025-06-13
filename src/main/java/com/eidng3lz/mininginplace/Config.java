@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -121,10 +122,12 @@ public class Config {
         }
         //尝试向服务端同步用户配置
         //当前处于未进入世界等情况时向服务端发数据包会抛错误，这里直接选择用try catch拦截掉这个错误
-        try {
-            PacketDistributor.sendToServer(new Packets.RequestPacket(Packets.RequestPacket.SET_CLIENT_CONFIGS, getClientConfigsToJSON()));
-        } catch (NullPointerException e) {
-            LogUtils.getLogger().info(e.toString());
+        if (FMLEnvironment.dist.isClient()) {
+            try {
+                PacketDistributor.sendToServer(new Packets.RequestPacket(Packets.RequestPacket.SET_CLIENT_CONFIGS, getClientConfigsToJSON()));
+            } catch (NullPointerException e) {
+                LogUtils.getLogger().info(e.toString());
+            }
         }
     }
 
