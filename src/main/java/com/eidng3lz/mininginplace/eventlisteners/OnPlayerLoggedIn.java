@@ -14,7 +14,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 @EventBusSubscriber(modid = MiningInPlace.MODID)
 public class OnPlayerLoggedIn {
     @SubscribeEvent
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+    public static void getPlayerConfiguration(PlayerEvent.PlayerLoggedInEvent event) {
         Player player = event.getEntity();
         Level world = player.level();
         LogUtils.getLogger().info("player logged in:{}", player.getName().getString());

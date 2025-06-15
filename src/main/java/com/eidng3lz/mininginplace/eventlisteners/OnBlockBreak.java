@@ -20,7 +20,7 @@ import java.util.Map;
 @EventBusSubscriber(modid = MiningInPlace.MODID)
 public class OnBlockBreak {
     @SubscribeEvent
-    public static void onBlockBreak(BlockEvent.BreakEvent event) {
+    public static void searchBlocksAndMoveBlock(BlockEvent.BreakEvent event) {
 //        LogUtils.getLogger().info("block break");
 
         LevelAccessor world = event.getLevel();
@@ -43,7 +43,7 @@ public class OnBlockBreak {
 //            }
 //        }
         BlockGroup blockGroup = new BlockGroup();
-        for (BlockGroup configBlockGroup : Config.chainlandBlocksGroups) {
+        for (BlockGroup configBlockGroup : Config.chainedBlocksGroups) {
             if (configBlockGroup.contains(eventBlockState.getBlock())) {
                 blockGroup.addBlockGroup(configBlockGroup);
             }

@@ -3,7 +3,7 @@
   "mininginplace.config.disable_at_creative": "Disable at creative",
   "mininginplace.config.depth_limit": "Maximum search depth",
   "mininginplace.config.search_steps_limit": "Search steps limit",
-  "mininginplace.config.blocks_groups": "Chainland blocks groups",
+  "mininginplace.config.blocks_groups": "Chained blocks groups",
   "mininginplace.configuration.section.mininginplace.common.toml.title": "Mining in place configs",
   "mininginplace.config.search_steps_limit.tooltip": "Server-side configuration\nDo not set too large a number to avoid performance issues.",
   "mininginplace.config.depth_limit.tooltip": "Server-side configuration\nDo not set too large a number to avoid performance issues.",
