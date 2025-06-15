@@ -15,7 +15,7 @@ import java.util.List;
 @EventBusSubscriber(modid = MiningInPlace.MODID)
 public class OnBlockDrops {
     @SubscribeEvent
-    public static void onBlockDrops(BlockDropsEvent event) {
+    public static void moveAndPushItemEntities(BlockDropsEvent event) {
         //设置方块和物品实体尺寸和弹射力度
         final double FORCE = 0.1;
         final double BLOCK_SIZE = 1.0;

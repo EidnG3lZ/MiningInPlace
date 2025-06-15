@@ -20,7 +20,7 @@ import java.util.Map;
 @EventBusSubscriber(modid = MiningInPlace.MODID)
 public class OnBlockBreak {
     @SubscribeEvent
-    public static void onBlockBreak(BlockEvent.BreakEvent event) {
+    public static void searchBlocksAndMoveBlock(BlockEvent.BreakEvent event) {
 //        LogUtils.getLogger().info("block break");
 
         LevelAccessor world = event.getLevel();

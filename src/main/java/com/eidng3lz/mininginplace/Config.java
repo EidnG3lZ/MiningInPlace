@@ -3,7 +3,6 @@ package com.eidng3lz.mininginplace;
 import com.eidng3lz.mininginplace.network.Packets;
 import com.eidng3lz.mininginplace.utils.BlockGroup;
 import com.google.common.reflect.TypeToken;
-import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -27,27 +26,30 @@ public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
     private static final ModConfigSpec.BooleanValue INVENT_CONTROL = BUILDER
-            .comment("反转潜行连锁控制", "客户端配置", "默认潜行时停止连锁。")
+            .comment("反转潜行连锁控制", "客户端配置", "默认潜行时停止连锁。", "Invent control", "Client configuration", "By default, function stops while sneaking")
             .translation("mininginplace.config.invent_control")
             .define("invent_control", false);
 
     private static final ModConfigSpec.BooleanValue DISABLE_AT_CREATIVE = BUILDER
-            .comment("创造模式下禁用", "客户端配置")
+            .comment("创造模式下禁用", "客户端配置", "Disable at creative", "Client configuration")
             .translation("mininginplace.config.disable_at_creative")
             .define("disable_at_creative", true);
 
     private static final ModConfigSpec.IntValue DEPTH_LIMIT = BUILDER
-            .comment("最大搜索深度", "服务端配置", "请勿设置过大的数值，以免出现性能问题。")
+            .comment("最大搜索深度", "服务端配置", "请勿设置过大的数值，以免出现性能问题。", "Maximum search depth", "Server-side configuration", "Do not set too large a number to avoid performance issues.")
             .translation("mininginplace.config.depth_limit")
             .defineInRange("depth_limit", 64, 0, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.IntValue SEARCH_STEPS_LIMIT = BUILDER
-            .comment("最大搜索步数", "服务端配置", "请勿设置过大的数值，以免出现性能问题。")
+            .comment("最大搜索步数", "服务端配置", "请勿设置过大的数值，以免出现性能问题。", "Search steps limit", "Server-side configuration", "Do not set too large a number to avoid performance issues.")
             .translation("mininginplace.config.search_steps_limit")
             .defineInRange("search_steps_limit", 256, 0, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.ConfigValue<List<? extends String>> CHAINLAND_BLOCKS_GROUPS = BUILDER
-            .comment("连锁方块组", "服务端配置", "每个字符串为一组，组内的多个ID或Tag之间用逗号分隔，Tag需要以#开头。", "命名空间为minecraft时命名空间可省略。")
+            .comment(
+                    "连锁方块组", "服务端配置", "每个字符串为一组，组内的多个ID或Tag之间用逗号分隔，Tag需要以#开头。", "命名空间为minecraft时命名空间可省略。",
+                    "Chainland blocks groups", "Server-side configuration", "Each string is a group, separated by a comma between multiple IDs or Tags in the group, and the Tags need to start with #.", "If the namespace is minecraft, the namespace can be omitted."
+            )
             .translation("mininginplace.config.blocks_groups")
             .defineListAllowEmpty(
                     "chainland_blocks_groups",
@@ -126,7 +128,7 @@ public class Config {
             try {
                 PacketDistributor.sendToServer(new Packets.RequestPacket(Packets.RequestPacket.SET_CLIENT_CONFIGS, getClientConfigsToJSON()));
             } catch (NullPointerException e) {
-                LogUtils.getLogger().info(e.toString());
+//                LogUtils.getLogger().info(e.toString());
             }
         }
     }
