@@ -1,7 +1,7 @@
 package com.eidng3lz.mininginplace;
 
 import com.eidng3lz.mininginplace.network.Packets;
-import com.eidng3lz.mininginplace.utils.BlockGroup;
+import com.eidng3lz.mininginplace.util.BlockGroup;
 import com.google.common.reflect.TypeToken;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;

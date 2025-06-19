@@ -1,4 +1,4 @@
-package com.eidng3lz.mininginplace.utils;
+package com.eidng3lz.mininginplace.util;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;

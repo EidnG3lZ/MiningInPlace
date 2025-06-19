@@ -1,4 +1,4 @@
-package com.eidng3lz.mininginplace.utils;
+package com.eidng3lz.mininginplace.util;
 
 public class KeyValuePair<K, V> {
     private K key;

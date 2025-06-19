@@ -2,9 +2,9 @@ package com.eidng3lz.mininginplace.eventlisteners;
 
 import com.eidng3lz.mininginplace.Config;
 import com.eidng3lz.mininginplace.MiningInPlace;
-import com.eidng3lz.mininginplace.utils.BlockGroup;
-import com.eidng3lz.mininginplace.utils.Dfs;
-import com.eidng3lz.mininginplace.utils.KeyValuePair;
+import com.eidng3lz.mininginplace.functions.Dfs;
+import com.eidng3lz.mininginplace.util.BlockGroup;
+import com.eidng3lz.mininginplace.util.KeyValuePair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LevelAccessor;

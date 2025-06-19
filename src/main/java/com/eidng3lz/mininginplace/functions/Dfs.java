@@ -1,5 +1,7 @@
-package com.eidng3lz.mininginplace.utils;
+package com.eidng3lz.mininginplace.functions;
 
+import com.eidng3lz.mininginplace.util.BlockGroup;
+import com.eidng3lz.mininginplace.util.KeyValuePair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 
