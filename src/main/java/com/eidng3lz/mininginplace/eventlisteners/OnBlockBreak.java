@@ -66,20 +66,20 @@ public class OnBlockBreak {
                         && !(((boolean) clientConfigsMap.get(Config.ClientConfigs.DISABLE_AT_CREATIVE)) && player.isCreative())
         ) {
             BlockSearcher searcher = new Bfs();
-            List<KeyValuePair<BlockPos, Integer>> dfsResultsList = searcher.search(world, eventBlockPos, blockGroup, Config.depthLimit, Config.searchStepsLimit);
-            BlockPos targetBlockPos;
-            KeyValuePair<BlockPos, Integer> deepest = dfsResultsList.getFirst();
-            for (KeyValuePair<BlockPos, Integer> keyValuePair : dfsResultsList) {
-                if (keyValuePair.getValue() == Config.depthLimit) {
-                    deepest = keyValuePair;
-                    break;
-                }
-                if (keyValuePair.getValue() > deepest.getValue()) {
-                    deepest = keyValuePair;
-                }
-            }
-            targetBlockPos = deepest.getKey();
-//            BlockPos togetBlockPos = dfs.dfs(world, eventBlockPos, blockGroup, Config.depthLimit).getFirst().getKey();
+            List<KeyValuePair<BlockPos, Integer>> searchResultsList = searcher.search(world, eventBlockPos, blockGroup, Config.depthLimit, Config.searchStepsLimit);
+//            BlockPos targetBlockPos;
+//            KeyValuePair<BlockPos, Integer> deepest = searchResultsList.getFirst();
+//            for (KeyValuePair<BlockPos, Integer> keyValuePair : searchResultsList) {
+//                if (keyValuePair.getValue() == Config.depthLimit) {
+//                    deepest = keyValuePair;
+//                    break;
+//                }
+//                if (keyValuePair.getValue() > deepest.getValue()) {
+//                    deepest = keyValuePair;
+//                }
+//            }
+//            targetBlockPos = deepest.getKey();
+            BlockPos targetBlockPos = searchResultsList.getLast().getKey();
             MiningInPlace.queueServerWork(1, new MoveBlock(world, targetBlockPos, eventBlockPos));
             //设置flag通知BlockDrops事件监听逻辑，准备移动和弹射掉落物
             MiningInPlace.blockBreakEventFlag.put(player.toString(), 0);
