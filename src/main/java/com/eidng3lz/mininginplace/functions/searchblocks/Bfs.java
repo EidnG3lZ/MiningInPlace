@@ -33,12 +33,13 @@ public class Bfs implements BlockSearcher {
         List<BlockPos> searchingList = new ArrayList<>();
         searchingList.add(startPos);
         searchedPos.add(startPos);
+        search_layer_by_layer:
         while (!searchingList.isEmpty() && depth <= depthLimit) {
             List<BlockPos> nextSearchList = new ArrayList<>();
             for (BlockPos searchingPos : searchingList) {
                 resultList.add(new KeyValuePair<>(searchingPos, depth));
                 if (resultList.size() >= searchStepsLimit) {
-                    continue;
+                    break search_layer_by_layer;
                 }
                 for (int[] offset : CONNECTED_BLOCK_RELATIVE_POS) {
                     BlockPos nextLayerPos = new BlockPos(
