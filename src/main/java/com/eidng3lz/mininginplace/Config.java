@@ -38,12 +38,12 @@ public class Config {
     private static final ModConfigSpec.IntValue DEPTH_LIMIT = BUILDER
             .comment("最大搜索深度", "服务端配置", "请勿设置过大的数值，以免出现性能问题。", "Maximum search depth", "Server-side configuration", "Do not set too large a number to avoid performance issues.")
             .translation("mininginplace.config.depth_limit")
-            .defineInRange("depth_limit", 64, 0, Integer.MAX_VALUE);
+            .defineInRange("depth_limit", 256, 0, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.IntValue SEARCH_STEPS_LIMIT = BUILDER
             .comment("最大搜索步数", "服务端配置", "请勿设置过大的数值，以免出现性能问题。", "Search steps limit", "Server-side configuration", "Do not set too large a number to avoid performance issues.")
             .translation("mininginplace.config.search_steps_limit")
-            .defineInRange("search_steps_limit", 256, 0, Integer.MAX_VALUE);
+            .defineInRange("search_steps_limit", 1024, 0, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.ConfigValue<List<? extends String>> CHAINED_BLOCKS_GROUPS = BUILDER
             .comment(

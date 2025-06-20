@@ -2,10 +2,12 @@ package com.eidng3lz.mininginplace.eventlisteners;
 
 import com.eidng3lz.mininginplace.Config;
 import com.eidng3lz.mininginplace.MiningInPlace;
-import com.eidng3lz.mininginplace.functions.Dfs;
+import com.eidng3lz.mininginplace.functions.searchblocks.Bfs;
+import com.eidng3lz.mininginplace.functions.searchblocks.BlockSearcher;
 import com.eidng3lz.mininginplace.util.BlockGroup;
 import com.eidng3lz.mininginplace.util.KeyValuePair;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -31,7 +33,7 @@ public class OnBlockBreak {
 //        LogUtils.getLogger().info("player game mode:{}",((ServerPlayer)player).gameMode.getGameModeForPlayer().getName());
 
         //如果触发破坏的不是真玩家则直接跳过
-        if (!player.getClass().getSimpleName().equals("ServerPlayer")) {
+        if (!player.getClass().equals(ServerPlayer.class)) {
             return;
         }
 
@@ -63,8 +65,8 @@ public class OnBlockBreak {
                         && (player.isShiftKeyDown() == (boolean) (clientConfigsMap.get(Config.ClientConfigs.INVENT_CONTROL)))
                         && !(((boolean) clientConfigsMap.get(Config.ClientConfigs.DISABLE_AT_CREATIVE)) && player.isCreative())
         ) {
-            Dfs dfs = new Dfs();
-            List<KeyValuePair<BlockPos, Integer>> dfsResultsList = dfs.dfs(world, eventBlockPos, blockGroup, Config.depthLimit, Config.searchStepsLimit);
+            BlockSearcher searcher = new Bfs();
+            List<KeyValuePair<BlockPos, Integer>> dfsResultsList = searcher.search(world, eventBlockPos, blockGroup, Config.depthLimit, Config.searchStepsLimit);
             BlockPos targetBlockPos;
             KeyValuePair<BlockPos, Integer> deepest = dfsResultsList.getFirst();
             for (KeyValuePair<BlockPos, Integer> keyValuePair : dfsResultsList) {
