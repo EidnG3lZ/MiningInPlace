@@ -11,7 +11,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -83,24 +82,6 @@ public class OnBlockBreak {
 //            targetBlockPos = deepest.getKey();
             BlockPos targetBlockPos = searchResultsList.getLast().getKey();
             DropAndMoveBlock.run(world, (ServerPlayer) player, eventBlockPos, targetBlockPos);
-        }
-    }
-
-    private static class MoveBlock implements Runnable {
-        LevelAccessor world;
-        BlockPos fromPos;
-        BlockPos toPos;
-
-        public MoveBlock(LevelAccessor world, BlockPos fromPos, BlockPos toPos) {
-            this.world = world;
-            this.fromPos = fromPos;
-            this.toPos = toPos;
-        }
-
-        @Override
-        public void run() {
-            world.setBlock(toPos, world.getBlockState(fromPos), Block.UPDATE_ALL);
-            world.destroyBlock(fromPos, false);
         }
     }
 }

@@ -96,7 +96,7 @@ public class DropAndMoveBlock {
             //计算将掉落物推动的力
             Vec3 pushVec = dropsSpawnPos.vectorTo(player.getEyePosition()).scale(FORCE);
             //生成掉落物，触发事件，生成蠹虫等东西
-            dropAndSpawn(world, destroyBlockState, destroyPos, player, itemStackOld, dropsSpawnPos, pushVec);
+            dropAndSpawn((ServerLevel) world, destroyBlockState, destroyPos, player, itemStackOld, dropsSpawnPos, pushVec);
             //添加统计和消耗饥饿
             player.awardStat(Stats.BLOCK_MINED.get(destroyBlock));
             player.causeFoodExhaustion(0.005F);
@@ -104,7 +104,7 @@ public class DropAndMoveBlock {
     }
 
     private static void dropAndSpawn(
-            LevelAccessor world,
+            ServerLevel world,
             BlockState blockState,
             BlockPos blockPos,
             Entity destroyer,
@@ -112,10 +112,7 @@ public class DropAndMoveBlock {
             Vec3 dropsSpawnPos,
             Vec3 pushVec
     ) {
-        if (!(world instanceof ServerLevel serverLevel)) {
-            return;
-        }
-        boolean shouldDrop = serverLevel.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS) && !serverLevel.restoringBlockSnapshots;
+        boolean shouldDrop = world.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS) && !world.restoringBlockSnapshots;
         //为生成蠹虫等需要BlockPos的逻辑生成一个BlockPos
         BlockPos spawnBlockPos = new BlockPos(
                 (int) Math.floor(dropsSpawnPos.x()),
@@ -125,54 +122,45 @@ public class DropAndMoveBlock {
         //计算掉落物列表
         List<ItemEntity> dropsItemEntityList;
         if (shouldDrop) {
-            List<ItemStack> dropItemStack = Block.getDrops(blockState, serverLevel, blockPos, null, destroyer, toolItemStack);
-            dropsItemEntityList = getDropItemEntityList(serverLevel, dropItemStack, dropsSpawnPos, pushVec);
+            List<ItemStack> dropItemStack = Block.getDrops(blockState, world, blockPos, null, destroyer, toolItemStack);
+            dropsItemEntityList = dropItemStack.stream()
+                    .filter(itemStack -> !itemStack.isEmpty())
+                    .map(itemStack -> {
+                        double x = dropsSpawnPos.x();
+                        double y = dropsSpawnPos.y() - ITEM_ENTITY_Y_POS_OFFSET;
+                        double z = dropsSpawnPos.z();
+                        ItemEntity itemEntity = new ItemEntity(
+                                world,
+                                x,
+                                y,
+                                z,
+                                itemStack,
+                                world.random.nextDouble() * 0.2 - 0.1,
+                                0.1,
+                                world.random.nextDouble() * 0.2 - 0.1
+                        );
+                        itemEntity.setDefaultPickUpDelay();
+                        itemEntity.push(pushVec);
+                        return itemEntity;
+                    })
+                    .collect(Collectors.toList());
         } else {
             dropsItemEntityList = new ArrayList<>();
         }
         //触发事件，获取事件结果，执行对应操作
-        BlockDropsEvent event = new BlockDropsEvent(serverLevel, blockPos, blockState, null, dropsItemEntityList, destroyer, toolItemStack);
+        BlockDropsEvent event = new BlockDropsEvent(world, blockPos, blockState, null, dropsItemEntityList, destroyer, toolItemStack);
         NeoForge.EVENT_BUS.post(event);
         if (event.isCanceled()) {
             return;
         }
         //生成掉落物
-        event.getDrops().forEach(serverLevel::addFreshEntity);
+        event.getDrops().forEach(world::addFreshEntity);
         //生成经验球
         int droppedExperience = event.getDroppedExperience();
         if (droppedExperience > 0 && shouldDrop) {
-            ExperienceOrb.award(serverLevel, dropsSpawnPos, droppedExperience);
+            ExperienceOrb.award(world, dropsSpawnPos, droppedExperience);
         }
         //生成蠹虫等东西
-        blockState.spawnAfterBreak(serverLevel, spawnBlockPos, toolItemStack, false);
-    }
-
-    private static List<ItemEntity> getDropItemEntityList(
-            ServerLevel serverLevel,
-            List<ItemStack> dropItemStackList,
-            Vec3 dropPos,
-            Vec3 pushVec
-    ) {
-        return dropItemStackList.stream()
-                .filter(itemStack -> !itemStack.isEmpty())
-                .map(itemStack -> {
-                    double x = dropPos.x();
-                    double y = dropPos.y() - ITEM_ENTITY_Y_POS_OFFSET;
-                    double z = dropPos.z();
-                    ItemEntity itemEntity = new ItemEntity(
-                            serverLevel,
-                            x,
-                            y,
-                            z,
-                            itemStack,
-                            serverLevel.random.nextDouble() * 0.2 - 0.1,
-                            0.1,
-                            serverLevel.random.nextDouble() * 0.2 - 0.1
-                    );
-                    itemEntity.setDefaultPickUpDelay();
-                    itemEntity.push(pushVec);
-                    return itemEntity;
-                })
-                .collect(Collectors.toList());
+        blockState.spawnAfterBreak(world, spawnBlockPos, toolItemStack, false);
     }
 }
