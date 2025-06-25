@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "com.eidng3lz.mininginplace.mixins.client",
+  "mixins": [
+  ],
+  "client": [
+    "MixinMultiPlayerGameMode"
+  ],
+  "server": [
+  ],
+  "compatibilityLevel": "JAVA_21",
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -2,6 +2,7 @@ package com.eidng3lz.mininginplace.eventlisteners;
 
 import com.eidng3lz.mininginplace.Config;
 import com.eidng3lz.mininginplace.MiningInPlace;
+import com.eidng3lz.mininginplace.functions.dodropandmoveblock.DropAndMoveBlock;
 import com.eidng3lz.mininginplace.functions.searchblocks.Bfs;
 import com.eidng3lz.mininginplace.functions.searchblocks.BlockSearcher;
 import com.eidng3lz.mininginplace.util.BlockGroup;
@@ -65,6 +66,7 @@ public class OnBlockBreak {
                         && (player.isShiftKeyDown() == (boolean) (clientConfigsMap.get(Config.ClientConfigs.INVENT_CONTROL)))
                         && !(((boolean) clientConfigsMap.get(Config.ClientConfigs.DISABLE_AT_CREATIVE)) && player.isCreative())
         ) {
+            event.setCanceled(true);
             BlockSearcher searcher = new Bfs();
             List<KeyValuePair<BlockPos, Integer>> searchResultsList = searcher.search(world, eventBlockPos, blockGroup, Config.depthLimit, Config.searchStepsLimit);
 //            BlockPos targetBlockPos;
@@ -80,9 +82,7 @@ public class OnBlockBreak {
 //            }
 //            targetBlockPos = deepest.getKey();
             BlockPos targetBlockPos = searchResultsList.getLast().getKey();
-            MiningInPlace.queueServerWork(1, new MoveBlock(world, targetBlockPos, eventBlockPos));
-            //设置flag通知BlockDrops事件监听逻辑，准备移动和弹射掉落物
-            MiningInPlace.blockBreakEventFlag.put(player.toString(), 0);
+            DropAndMoveBlock.run(world, (ServerPlayer) player, eventBlockPos, targetBlockPos);
         }
     }
 

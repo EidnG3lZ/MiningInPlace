@@ -97,31 +97,7 @@ public class Config {
         disableAtCreative = DISABLE_AT_CREATIVE.get();
         depthLimit = DEPTH_LIMIT.get();
         searchStepsLimit = SEARCH_STEPS_LIMIT.get();
-//        chainlandBlocksGroups = CHAINLAND_BLOCKS_GROUPS.get().stream()
-//                .map(
-//                        group -> Arrays.stream(group.split(","))
-//                                .map(String::trim)
-//                                .filter(name -> !name.isEmpty())
-//                                .map(name -> BuiltInRegistries.BLOCK.get(ResourceLocation.parse(name)))
-//                                .collect(Collectors.toSet())
-//                )
-//                .collect(Collectors.toList());
-        chainedBlocksGroups = new ArrayList<>();
-        for (String group : CHAINED_BLOCKS_GROUPS.get()) {
-            List<String> blockIDOrTagList = new ArrayList<>();
-            String[] splitGroup = group.split(",");
-            BlockGroup blockGroup = new BlockGroup();
-            for (String s : splitGroup) {
-                String blockIDOrTag = s.trim();
-                if (!blockIDOrTag.isEmpty()) {
-                    blockIDOrTagList.add(blockIDOrTag);
-                }
-            }
-            for (String s : blockIDOrTagList) {
-                blockGroup.addFromStr(s);
-            }
-            chainedBlocksGroups.add(blockGroup);
-        }
+        chainedBlocksGroups = decodeChainedBlocksGroups(CHAINED_BLOCKS_GROUPS.get());
         //尝试向服务端同步用户配置
         //当前处于未进入世界等情况时向服务端发数据包会抛错误，这里直接选择用try catch拦截掉这个错误
         if (FMLEnvironment.dist.isClient()) {
@@ -129,6 +105,14 @@ public class Config {
                 PacketDistributor.sendToServer(new Packets.RequestPacket(Packets.RequestPacket.SET_CLIENT_CONFIGS, getClientConfigsToJSON()));
             } catch (NullPointerException e) {
 //                LogUtils.getLogger().info(e.toString());
+            }
+        }
+        //向客户端同步配置，目前仅用于判断是否应该取消方块破坏的视觉效果
+        if (!FMLEnvironment.dist.isClient()) {
+            try {
+                PacketDistributor.sendToAllPlayers(new Packets.RequestPacket(Packets.RequestPacket.SET_SERVER_CONFIGS, getServerConfigsToJSON()));
+            } catch (NullPointerException ignored) {
+
             }
         }
     }
@@ -164,6 +148,26 @@ public class Config {
         return true;
     }
 
+    public static List<BlockGroup> decodeChainedBlocksGroups(List<? extends String> stringList) {
+        List<BlockGroup> blocksGroups = new ArrayList<>();
+        for (String group : stringList) {
+            List<String> blockIDOrTagList = new ArrayList<>();
+            String[] splitGroup = group.split(",");
+            BlockGroup blockGroup = new BlockGroup();
+            for (String s : splitGroup) {
+                String blockIDOrTag = s.trim();
+                if (!blockIDOrTag.isEmpty()) {
+                    blockIDOrTagList.add(blockIDOrTag);
+                }
+            }
+            for (String s : blockIDOrTagList) {
+                blockGroup.addFromStr(s);
+            }
+            blocksGroups.add(blockGroup);
+        }
+        return blocksGroups;
+    }
+
     //将所有客户端配置转换成json字符串
     public static String getClientConfigsToJSON() {
         Map<ClientConfigs, Object> map = new HashMap<>();
@@ -177,20 +181,41 @@ public class Config {
         return json;
     }
 
-    public enum ClientConfigs {
-        INVENT_CONTROL("invent control", Config.INVENT_CONTROL),
-        DISABLE_AT_CREATIVE("disable at creative", Config.DISABLE_AT_CREATIVE);
+    public static String getServerConfigsToJSON() {
+        Map<ServerConfigs, Object> map = new HashMap<>();
+        for (ServerConfigs serverConfig : ServerConfigs.values()) {
+            map.put(serverConfig, serverConfig.getConfig().get());
+        }
+        Type type = new TypeToken<Map<ServerConfigs, Object>>() {
+        }.getType();
+        String json = MiningInPlace.gson.toJson(map, type);
+        return json;
+    }
 
-        private final String name;
+    public enum ClientConfigs {
+        INVENT_CONTROL(Config.INVENT_CONTROL),
+        DISABLE_AT_CREATIVE(Config.DISABLE_AT_CREATIVE);
+
         private final Supplier<?> config;
 
-        ClientConfigs(String name, Supplier<?> config) {
-            this.name = name;
+        ClientConfigs(Supplier<?> config) {
             this.config = config;
         }
 
-        public String getName() {
-            return name;
+        public Supplier<?> getConfig() {
+            return config;
+        }
+    }
+
+    public enum ServerConfigs {
+        DEPTH_LIMIT(Config.DEPTH_LIMIT),
+        SEARCH_STEPS_LIMIT(Config.SEARCH_STEPS_LIMIT),
+        CHAINED_BLOCKS_GROUPS(Config.CHAINED_BLOCKS_GROUPS);
+
+        private final Supplier<?> config;
+
+        ServerConfigs(Supplier<?> config) {
+            this.config = config;
         }
 
         public Supplier<?> getConfig() {
