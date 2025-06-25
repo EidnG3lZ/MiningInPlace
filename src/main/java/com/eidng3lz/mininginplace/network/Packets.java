@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
+import java.util.List;
 import java.util.Map;
 
 public class Packets {
@@ -46,6 +47,9 @@ public class Packets {
                     });
                     MiningInPlace.serverConfigs.clear();
                     MiningInPlace.serverConfigs.putAll(map);
+                    //一些需要转换的配置可以将转换后的值替换掉原始值，以减少使用时转换带来的性能浪费
+                    Config.ServerConfigs key = Config.ServerConfigs.CHAINED_BLOCKS_GROUPS;
+                    MiningInPlace.serverConfigs.put(key, Config.decodeChainedBlocksGroups((List<String>) map.get(key)));
                 }
                 case RequestPacket.PLAY_BLOCK_DESTROY_EFFECT -> {
                     Level level = context.player().level();

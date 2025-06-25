@@ -30,7 +30,7 @@ public class MixinMultiPlayerGameMode {
         BlockState blockState = world.getBlockState(pos);
         LocalPlayer player = minecraft.player;
         BlockGroup blockGroup = new BlockGroup();
-        List<BlockGroup> chainedBlocksGroups = Config.decodeChainedBlocksGroups((List<String>) MiningInPlace.serverConfigs.get(Config.ServerConfigs.CHAINED_BLOCKS_GROUPS));
+        @SuppressWarnings("unchecked") List<BlockGroup> chainedBlocksGroups = (List<BlockGroup>) MiningInPlace.serverConfigs.get(Config.ServerConfigs.CHAINED_BLOCKS_GROUPS);
         for (BlockGroup configBlockGroup : chainedBlocksGroups) {
             if (configBlockGroup.contains(blockState.getBlock())) {
                 blockGroup.addBlockGroup(configBlockGroup);

@@ -62,6 +62,9 @@ public class DropAndMoveBlock {
             return;
         }
         //而生存/冒险模式下要考虑的就多了
+        //移动方块
+        world.setBlock(destroyPos, world.getBlockState(moveFromPos), Block.UPDATE_ALL);
+        world.destroyBlock(moveFromPos, false);
         //用于挖掘的工具
         ItemStack itemStack = player.getMainHandItem();
         //记录工具挖掘前的状态
@@ -72,9 +75,6 @@ public class DropAndMoveBlock {
         if (itemStack.isEmpty() && !itemStackOld.isEmpty()) {
             EventHooks.onPlayerDestroyItem(player, itemStackOld, InteractionHand.MAIN_HAND);
         }
-        //移动方块
-        world.setBlock(destroyPos, world.getBlockState(moveFromPos), Block.UPDATE_ALL);
-        world.destroyBlock(moveFromPos, false);
         //判断能否挖掘出掉落物
         if (destroyBlockState.canHarvestBlock(world, destroyPos, player)) {
             //计算掉落物生成位置
