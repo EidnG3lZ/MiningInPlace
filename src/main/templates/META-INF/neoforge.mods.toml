@@ -44,7 +44,8 @@ displayName="${mod_name}" #mandatory
 authors="${mod_authors}" #optional
 
 # The description text for the mod (multi line!) (#mandatory)
-description='''${mod_description}'''
+description = '''在玩家挖掘成片的同类方块（比如砍树和采矿）时将这片方块中最远的方块不断移动至挖掘位置，使得其无需移动位置，站在原地即可一次挖完整片方块。
+Move the farthest block of the vein/tree in front of you to dig the entire vein or tree in place.'''
 
 # The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
 [[mixins]]
