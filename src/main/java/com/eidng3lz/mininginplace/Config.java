@@ -108,12 +108,9 @@ public class Config {
             }
         }
         //向客户端同步配置，目前仅用于判断是否应该取消方块破坏的视觉效果
-        if (!FMLEnvironment.dist.isClient()) {
-            try {
-                PacketDistributor.sendToAllPlayers(new Packets.RequestPacket(Packets.RequestPacket.SET_SERVER_CONFIGS, getServerConfigsToJSON()));
-            } catch (NullPointerException ignored) {
-
-            }
+        try {
+            PacketDistributor.sendToAllPlayers(new Packets.RequestPacket(Packets.RequestPacket.SET_SERVER_CONFIGS, getServerConfigsToJSON()));
+        } catch (NullPointerException ignored) {
         }
     }
 
