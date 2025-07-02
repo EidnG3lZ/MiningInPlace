@@ -1,9 +1,6 @@
 package com.eidng3lz.mininginplace.functions.dodropandmoveblock;
 
-import com.eidng3lz.mininginplace.MiningInPlace;
 import com.eidng3lz.mininginplace.functions.aabb.Intersection;
-import com.eidng3lz.mininginplace.network.Packets;
-import com.eidng3lz.mininginplace.network.misc.RequestPacketArgs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,7 +21,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,12 +44,6 @@ public class DropAndMoveBlock {
         }
         //触发玩家破坏前应执行的一些东西
         destroyBlockState = destroyBlock.playerWillDestroy((Level) world, destroyPos, destroyBlockState, player);
-        //通知客户端播放粒子和声音
-        String args = MiningInPlace.gson.toJson(new RequestPacketArgs.BlockDestroyEffectArgs(
-                new int[]{destroyPos.getX(), destroyPos.getY(), destroyPos.getZ()},
-                Block.getId(destroyBlockState)
-        ));
-        PacketDistributor.sendToAllPlayers(new Packets.RequestPacket(Packets.RequestPacket.PLAY_BLOCK_DESTROY_EFFECT, args));
         //创造模式下只需要移动方块就行了
         if (player.isCreative()) {
             //移动方块

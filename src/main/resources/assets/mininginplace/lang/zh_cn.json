@@ -12,5 +12,6 @@
   "mininginplace.config.blocks_groups.tooltip": "服务端配置\n每个字符串为一组，组内的多个ID或Tag之间用逗号分隔，Tag需要以#开头。\n命名空间为minecraft时命名空间可省略。",
   "mininginplace.configuration.title": "mininginplace.configuration.title",
   "mininginplace.config.disable_at_creative.tooltip": "客户端配置",
-  "mininginplace.configuration.section.mininginplace.common.toml": "mininginplace.configuration.section.mininginplace.common.toml"
+  "mininginplace.configuration.section.mininginplace.common.toml": "mininginplace.configuration.section.mininginplace.common.toml",
+  "key.MiningInPlace.temporary_function_control": "临时启用连锁挖掘"
 }

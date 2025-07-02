@@ -1,6 +1,6 @@
 package com.eidng3lz.mininginplace;
 
-import com.eidng3lz.mininginplace.network.Packets;
+import com.eidng3lz.mininginplace.network.packets.RequestPacket;
 import com.eidng3lz.mininginplace.util.BlockGroup;
 import com.google.common.reflect.TypeToken;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -102,14 +102,14 @@ public class Config {
         //当前处于未进入世界等情况时向服务端发数据包会抛错误，这里直接选择用try catch拦截掉这个错误
         if (FMLEnvironment.dist.isClient()) {
             try {
-                PacketDistributor.sendToServer(new Packets.RequestPacket(Packets.RequestPacket.SET_CLIENT_CONFIGS, getClientConfigsToJSON()));
-            } catch (NullPointerException e) {
+                PacketDistributor.sendToServer(new RequestPacket(RequestPacket.SET_CLIENT_CONFIGS, getClientConfigsToJSON()));
+            } catch (NullPointerException ignored) {
 //                LogUtils.getLogger().info(e.toString());
             }
         }
         //向客户端同步配置，目前仅用于判断是否应该取消方块破坏的视觉效果
         try {
-            PacketDistributor.sendToAllPlayers(new Packets.RequestPacket(Packets.RequestPacket.SET_SERVER_CONFIGS, getServerConfigsToJSON()));
+            PacketDistributor.sendToAllPlayers(new RequestPacket(RequestPacket.SET_SERVER_CONFIGS, getServerConfigsToJSON()));
         } catch (NullPointerException ignored) {
         }
     }

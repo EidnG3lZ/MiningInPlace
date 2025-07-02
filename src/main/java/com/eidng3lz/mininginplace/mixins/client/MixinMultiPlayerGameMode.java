@@ -1,7 +1,7 @@
 package com.eidng3lz.mininginplace.mixins.client;
 
 import com.eidng3lz.mininginplace.Config;
-import com.eidng3lz.mininginplace.MiningInPlace;
+import com.eidng3lz.mininginplace.MiningInPlaceClient;
 import com.eidng3lz.mininginplace.util.BlockGroup;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -30,10 +30,14 @@ public class MixinMultiPlayerGameMode {
         BlockState blockState = world.getBlockState(pos);
         LocalPlayer player = minecraft.player;
         BlockGroup blockGroup = new BlockGroup();
-        @SuppressWarnings("unchecked") List<BlockGroup> chainedBlocksGroups = (List<BlockGroup>) MiningInPlace.serverConfigs.get(Config.ServerConfigs.CHAINED_BLOCKS_GROUPS);
-        for (BlockGroup configBlockGroup : chainedBlocksGroups) {
-            if (configBlockGroup.contains(blockState.getBlock())) {
-                blockGroup.addBlockGroup(configBlockGroup);
+        if (MiningInPlaceClient.keyState) {
+            blockGroup.add(blockState.getBlock());
+        } else {
+            @SuppressWarnings("unchecked") List<BlockGroup> chainedBlocksGroups = (List<BlockGroup>) MiningInPlaceClient.serverConfigs.get(Config.ServerConfigs.CHAINED_BLOCKS_GROUPS);
+            for (BlockGroup configBlockGroup : chainedBlocksGroups) {
+                if (configBlockGroup.contains(blockState.getBlock())) {
+                    blockGroup.addBlockGroup(configBlockGroup);
+                }
             }
         }
         if (

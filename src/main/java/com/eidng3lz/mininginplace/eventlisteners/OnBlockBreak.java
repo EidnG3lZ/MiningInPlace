@@ -5,16 +5,19 @@ import com.eidng3lz.mininginplace.MiningInPlace;
 import com.eidng3lz.mininginplace.functions.dodropandmoveblock.DropAndMoveBlock;
 import com.eidng3lz.mininginplace.functions.searchblocks.Bfs;
 import com.eidng3lz.mininginplace.functions.searchblocks.BlockSearcher;
+import com.eidng3lz.mininginplace.network.packets.BlockDestroyPacket;
 import com.eidng3lz.mininginplace.util.BlockGroup;
 import com.eidng3lz.mininginplace.util.KeyValuePair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 import java.util.Map;
@@ -38,16 +41,14 @@ public class OnBlockBreak {
         }
 
         //计算搜索目标
-//        Set<Block> blockGroups = new HashSet<>();
-//        for (Set<Block> blocksAndTags : Config.chainlandBlocksGroups) {
-//            if (blocksAndTags.contains(eventBlockState.getBlock())) {
-//                blockGroups.addAll(blocksAndTags);
-//            }
-//        }
         BlockGroup blockGroup = new BlockGroup();
-        for (BlockGroup configBlockGroup : Config.chainedBlocksGroups) {
-            if (configBlockGroup.contains(eventBlockState.getBlock())) {
-                blockGroup.addBlockGroup(configBlockGroup);
+        if (MiningInPlace.playerKeyState.get(player.getUUID())) {
+            blockGroup.add(eventBlockState.getBlock());
+        } else {
+            for (BlockGroup configBlockGroup : Config.chainedBlocksGroups) {
+                if (configBlockGroup.contains(eventBlockState.getBlock())) {
+                    blockGroup.addBlockGroup(configBlockGroup);
+                }
             }
         }
 
@@ -59,7 +60,7 @@ public class OnBlockBreak {
 //        LogUtils.getLogger().info("player sneaking:{}", player.isShiftKeyDown());
 
         //判断方块属于目标且玩家当前需要连锁破坏
-        Map<Config.ClientConfigs, Object> clientConfigsMap = MiningInPlace.playerConfigs.get(player.getName().getString());
+        Map<Config.ClientConfigs, Object> clientConfigsMap = MiningInPlace.playerConfigs.get(player.getUUID());
         if (
                 !blockGroup.isEmpty()
                         && (player.isShiftKeyDown() == (boolean) (clientConfigsMap.get(Config.ClientConfigs.INVENT_CONTROL)))
@@ -81,6 +82,16 @@ public class OnBlockBreak {
 //            }
 //            targetBlockPos = deepest.getKey();
             BlockPos targetBlockPos = searchResultsList.getLast().getKey();
+            //向客户端发送数据包播放声音和粒子
+            PacketDistributor.sendToAllPlayers(
+                    new BlockDestroyPacket(
+                            eventBlockPos.getX(),
+                            eventBlockPos.getY(),
+                            eventBlockPos.getZ(),
+                            Block.getId(eventBlockState)
+                    )
+            );
+            //执行掉落和移动方块的相关逻辑
             DropAndMoveBlock.run(world, (ServerPlayer) player, eventBlockPos, targetBlockPos);
         }
     }

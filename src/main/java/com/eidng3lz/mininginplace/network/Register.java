@@ -1,6 +1,9 @@
 package com.eidng3lz.mininginplace.network;
 
 import com.eidng3lz.mininginplace.MiningInPlace;
+import com.eidng3lz.mininginplace.network.packets.BlockDestroyPacket;
+import com.eidng3lz.mininginplace.network.packets.KeyStatePacket;
+import com.eidng3lz.mininginplace.network.packets.RequestPacket;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -14,12 +17,24 @@ public class Register {
         final PayloadRegistrar registrar = event.registrar(MiningInPlace.MODID);
 
         registrar.playBidirectional(
-                Packets.RequestPacket.TYPE,
-                Packets.RequestPacket.STREAM_CODEC,
+                RequestPacket.TYPE,
+                RequestPacket.STREAM_CODEC,
                 new DirectionalPayloadHandler<>(
-                        Packets.RequestPacket::onClientHandleDate,
-                        Packets.RequestPacket::onServerHandleDate
+                        RequestPacket::onClientHandleDate,
+                        RequestPacket::onServerHandleDate
                 )
+        );
+
+        registrar.playToClient(
+                BlockDestroyPacket.TYPE,
+                BlockDestroyPacket.STREAM_CODEC,
+                BlockDestroyPacket::onClientHandleDate
+        );
+
+        registrar.playToServer(
+                KeyStatePacket.TYPE,
+                KeyStatePacket.STREAM_CODEC,
+                KeyStatePacket::onServerHandleDate
         );
     }
 }
