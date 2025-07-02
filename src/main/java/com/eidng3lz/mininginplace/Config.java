@@ -45,6 +45,11 @@ public class Config {
             .translation("mininginplace.config.search_steps_limit")
             .defineInRange("search_steps_limit", 1024, 0, Integer.MAX_VALUE);
 
+    private static final ModConfigSpec.BooleanValue DISABLE_TEMPORARY_CHAINED_FUNCTION = BUILDER
+            .comment("禁用临时连锁挖掘功能", "服务端配置", "Disable temporary chained digging function", "Server-side configuration")
+            .translation("mininginplace.config.disable_temporary_chained_function")
+            .define("disable_temporary_chained_function", false);
+
     private static final ModConfigSpec.ConfigValue<List<? extends String>> CHAINED_BLOCKS_GROUPS = BUILDER
             .comment(
                     "连锁方块组", "服务端配置", "每个字符串为一组，组内的多个ID或Tag之间用逗号分隔，Tag需要以#开头。", "命名空间为minecraft时命名空间可省略。",
@@ -89,6 +94,7 @@ public class Config {
     public static boolean disableAtCreative;
     public static int depthLimit;
     public static int searchStepsLimit;
+    public static boolean disableTemporaryChainedFunction;
     public static List<BlockGroup> chainedBlocksGroups;
 
     @SubscribeEvent
@@ -97,6 +103,7 @@ public class Config {
         disableAtCreative = DISABLE_AT_CREATIVE.get();
         depthLimit = DEPTH_LIMIT.get();
         searchStepsLimit = SEARCH_STEPS_LIMIT.get();
+        disableTemporaryChainedFunction = DISABLE_TEMPORARY_CHAINED_FUNCTION.get();
         chainedBlocksGroups = decodeChainedBlocksGroups(CHAINED_BLOCKS_GROUPS.get());
         //尝试向服务端同步用户配置
         //当前处于未进入世界等情况时向服务端发数据包会抛错误，这里直接选择用try catch拦截掉这个错误
@@ -207,6 +214,7 @@ public class Config {
     public enum ServerConfigs {
         DEPTH_LIMIT(Config.DEPTH_LIMIT),
         SEARCH_STEPS_LIMIT(Config.SEARCH_STEPS_LIMIT),
+        DISABLE_TEMPORARY_CHAINED_FUNCTION(Config.DISABLE_TEMPORARY_CHAINED_FUNCTION),
         CHAINED_BLOCKS_GROUPS(Config.CHAINED_BLOCKS_GROUPS);
 
         private final Supplier<?> config;

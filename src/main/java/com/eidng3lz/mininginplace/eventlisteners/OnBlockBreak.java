@@ -42,7 +42,7 @@ public class OnBlockBreak {
 
         //计算搜索目标
         BlockGroup blockGroup = new BlockGroup();
-        if (MiningInPlace.playerKeyState.get(player.getUUID())) {
+        if (MiningInPlace.playerKeyState.get(player.getUUID()) && !Config.disableTemporaryChainedFunction) {
             blockGroup.add(eventBlockState.getBlock());
         } else {
             for (BlockGroup configBlockGroup : Config.chainedBlocksGroups) {

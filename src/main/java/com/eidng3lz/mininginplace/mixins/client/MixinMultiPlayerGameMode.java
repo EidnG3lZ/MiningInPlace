@@ -30,7 +30,7 @@ public class MixinMultiPlayerGameMode {
         BlockState blockState = world.getBlockState(pos);
         LocalPlayer player = minecraft.player;
         BlockGroup blockGroup = new BlockGroup();
-        if (MiningInPlaceClient.keyState) {
+        if (MiningInPlaceClient.keyState && !(boolean) MiningInPlaceClient.serverConfigs.get(Config.ServerConfigs.DISABLE_TEMPORARY_CHAINED_FUNCTION)) {
             blockGroup.add(blockState.getBlock());
         } else {
             @SuppressWarnings("unchecked") List<BlockGroup> chainedBlocksGroups = (List<BlockGroup>) MiningInPlaceClient.serverConfigs.get(Config.ServerConfigs.CHAINED_BLOCKS_GROUPS);
